@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abhay Singh — Site Reliability / DevOps Engineer</title>
+<meta name="description" content="Abhay Singh — Site Reliability Engineer & DevOps Engineer. Built production AWS ECS infrastructure from scratch, cut cloud costs 30% through automation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --bg-panel:#111A2E;
+    --bg-panel-raised:#15203A;
+    --border:#22304A;
+    --border-bright:#324567;
+    --text:#E7ECF5;
+    --text-muted:#8C9AB3;
+    --text-dim:#5C6B85;
+    --amber:#F2A65A;
+    --cyan:#5EEAD4;
+    --rose:#F2667A;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.06;
+    pointer-events:none;
+    z-index:0;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+  ::selection{background:var(--amber);color:#0B1220;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,18,32,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:980px;margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .brand{
+    font-family:var(--mono);font-weight:700;font-size:14px;
+    display:flex;align-items:center;gap:8px;color:var(--text);
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+  .topnav{display:flex;gap:24px;font-family:var(--mono);font-size:12.5px;color:var(--text-muted);}
+  .topnav a:hover{color:var(--amber);}
+  @media (max-width:640px){ .topnav{display:none;} }
+
+  /* ---------- hero ---------- */
+  .hero{padding:72px 0 40px;}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;color:var(--cyan);
+    letter-spacing:.06em;margin-bottom:18px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow .blink{animation:blink 1.4s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  h1{
+    font-family:var(--mono);font-weight:800;
+    font-size:clamp(34px,6vw,58px);
+    letter-spacing:-0.02em;line-height:1.05;
+    color:var(--text);
+  }
+  h1 span{color:var(--amber);}
+  .role{
+    font-family:var(--sans);font-size:clamp(16px,2.4vw,20px);
+    color:var(--text-muted);margin-top:14px;max-width:620px;
+  }
+  .role strong{color:var(--text);font-weight:600;}
+
+  .hero-cta{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    padding:12px 20px;border-radius:6px;border:1px solid var(--border-bright);
+    display:inline-flex;align-items:center;gap:8px;transition:all .15s ease;
+  }
+  .btn-primary{background:var(--amber);color:#1A1206;border-color:var(--amber);}
+  .btn-primary:hover{background:#ffbd75;}
+  .btn-ghost{color:var(--text);}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+
+  /* ---------- terminal stat panel ---------- */
+  .termcard{
+    margin-top:52px;background:var(--bg-panel);
+    border:1px solid var(--border);border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);
+  }
+  .termhead{
+    display:flex;align-items:center;gap:8px;
+    padding:11px 16px;border-bottom:1px solid var(--border);
+    background:var(--bg-panel-raised);
+  }
+  .termhead .tdot{width:10px;height:10px;border-radius:50%;}
+  .td-r{background:#F2667A;} .td-y{background:#F2A65A;} .td-g{background:#5EEAD4;}
+  .termhead .tpath{
+    margin-left:8px;font-family:var(--mono);font-size:12px;color:var(--text-dim);
+  }
+  .termbody{padding:22px 22px 26px;font-family:var(--mono);font-size:13.5px;}
+  .termline{color:var(--text-muted);margin-bottom:4px;}
+  .termline .prompt{color:var(--cyan);}
+  .termline .cmd{color:var(--text);}
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    margin-top:18px;background:var(--border);
+    border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  }
+  .stat{background:var(--bg-panel);padding:18px 16px;}
+  .stat .num{font-size:26px;font-weight:800;color:var(--amber);}
+  .stat .label{font-size:11px;color:var(--text-dim);margin-top:4px;letter-spacing:.03em;}
+  @media (max-width:640px){ .stat-grid{grid-template-columns:1fr 1fr;} }
+
+  /* ---------- section shell ---------- */
+  section{padding:64px 0;border-top:1px solid var(--border);}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:30px;}
+  .sec-tag{
+    font-family:var(--mono);font-size:11.5px;color:var(--text-dim);
+    border:1px solid var(--border-bright);padding:3px 9px;border-radius:4px;
+  }
+  .sec-title{font-family:var(--mono);font-weight:700;font-size:22px;}
+  .sec-intro{color:var(--text-muted);max-width:640px;margin-bottom:30px;font-size:15px;}
+
+  /* ---------- service status board (signature) ---------- */
+  .svc-board{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .svc-row{
+    display:grid;grid-template-columns:18px 1fr auto;gap:16px;
+    align-items:start;padding:18px 20px;border-bottom:1px solid var(--border);
+    background:var(--bg-panel);cursor:pointer;transition:background .15s ease;
+  }
+  .svc-row:last-child{border-bottom:none;}
+  .svc-row:hover{background:var(--bg-panel-raised);}
+  .svc-dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-top:6px;}
+  .svc-name{font-family:var(--mono);font-weight:600;font-size:14.5px;color:var(--text);}
+  .svc-name .unit{color:var(--text-dim);font-weight:400;}
+  .svc-desc{color:var(--text-muted);font-size:13.5px;margin-top:6px;max-width:560px;}
+  .svc-detail{
+    color:var(--text-dim);font-size:12.5px;margin-top:10px;max-width:560px;
+    display:none;border-left:2px solid var(--border-bright);padding-left:12px;
+  }
+  .svc-row.open .svc-detail{display:block;}
+  .svc-status{
+    font-family:var(--mono);font-size:11px;color:var(--cyan);
+    border:1px solid #1d4a44;background:rgba(94,234,212,0.08);
+    padding:4px 9px;border-radius:4px;white-space:nowrap;height:fit-content;
+  }
+
+  /* ---------- experience ---------- */
+  .job{padding:24px 0;border-bottom:1px solid var(--border);}
+  .job:last-child{border-bottom:none;}
+  .job-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+  .job-title{font-weight:700;font-size:17px;}
+  .job-meta{font-family:var(--mono);font-size:12px;color:var(--text-dim);}
+  .job-role{color:var(--amber);font-family:var(--mono);font-size:13px;margin-bottom:14px;}
+  .job-list{list-style:none;}
+  .job-list li{
+    position:relative;padding-left:20px;margin-bottom:10px;color:var(--text-muted);font-size:14.5px;
+  }
+  .job-list li::before{
+    content:"▸";position:absolute;left:0;color:var(--cyan);font-size:12px;top:3px;
+  }
+  .job-list li strong{color:var(--text);font-weight:600;}
+
+  /* ---------- stack ---------- */
+  .stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+  .stack-cat{border:1px solid var(--border);border-radius:8px;padding:18px 18px 16px;background:var(--bg-panel);}
+  .stack-cat h3{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.04em;margin-bottom:12px;text-transform:uppercase;}
+  .chip-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{
+    font-family:var(--mono);font-size:12px;color:var(--text-muted);
+    border:1px solid var(--border-bright);padding:5px 10px;border-radius:5px;
+  }
+
+  /* ---------- education / certs ---------- */
+  .ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media (max-width:640px){ .ed-grid{grid-template-columns:1fr;} }
+  .ed-card{border:1px solid var(--border);border-radius:8px;padding:20px;background:var(--bg-panel);}
+  .ed-card .k{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:8px;}
+  .ed-card .v{font-weight:700;font-size:15px;}
+  .ed-card .s{color:var(--text-muted);font-size:13.5px;margin-top:4px;}
+
+  /* ---------- footer / contact ---------- */
+  footer{padding:64px 0 80px;border-top:1px solid var(--border);}
+  .contact-card{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;
+    padding:40px;text-align:center;
+  }
+  .contact-card h2{font-family:var(--mono);font-size:24px;margin-bottom:10px;}
+  .contact-card p{color:var(--text-muted);max-width:480px;margin:0 auto 26px;}
+  .contact-links{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+  .footnote{text-align:center;margin-top:40px;color:var(--text-dim);font-family:var(--mono);font-size:12px;}
+
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:5px;}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .eyebrow .blink{animation:none;}
+  }
+
+  a:focus-visible, .btn:focus-visible, .svc-row:focus-visible{
+    outline:2px solid var(--cyan); outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="dot"></span> abhay@infra:~$</div>
+    <nav class="topnav">
+      <a href="#services">automations</a>
+      <a href="#experience">experience</a>
+      <a href="#stack">stack</a>
+      <a href="#certs">certs</a>
+      <a href="#contact">contact</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero" style="border-top:none;padding-top:64px;">
+    <div class="eyebrow"><span class="blink">●</span> SYSTEM STATUS: ALL SERVICES ACTIVE</div>
+    <h1>Abhay Singh<br><span>Reliability-focused: "keeps production running while everyone else sleeps".</span></h1>
+    <p class="role">Site Reliability Engineer & DevOps Engineer <strong>Sole architect</strong> of a production AWS ECS platform built from scratch, and of the automation layer around it &mdash; cutting monthly cloud spend by <strong>up to 30%</strong>.</p>
+
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="AbhaySingh_DevOps_Resume.pdf" download>↓ Download Resume (PDF)</a>
+      <a class="btn btn-ghost" href="#contact">Get in touch</a>
+      <a class="btn btn-ghost" href="https://github.com/abhaysingh07082000" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+
+    <div class="termcard">
+      <div class="termhead">
+        <span class="tdot td-r"></span><span class="tdot td-y"></span><span class="tdot td-g"></span>
+        <span class="tpath">abhay@aws-prod:~$ uptime --career</span>
+      </div>
+      <div class="termbody">
+        <div class="termline"><span class="prompt">$</span> <span class="cmd">whoami --role</span></div>
+        <div class="termline">Site-Reliability-Engineer, Aakash Educational Services, Feb-2023 → present</div>
+        <div class="stat-grid">
+          <div class="stat"><div class="num" id="uptimeYears">3.5+</div><div class="label">YEARS IN PRODUCTION</div></div>
+          <div class="stat"><div class="num">30%</div><div class="label">AWS COST REDUCED</div></div>
+          <div class="stat"><div class="num">10</div><div class="label">AUTOMATIONS & INTEGRATIONS SHIPPED</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="sec-head"><span class="sec-tag">01</span><span class="sec-title">systemctl status — automations built from scratch</span></div>
+    <p class="sec-intro">Every one of these was designed, built, and is operated solely by me on top of a hand-built AWS ECS platform. Click a row to expand.</p>
+
+    <div class="svc-board" id="svcBoard">
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">aws-ecs-platform <span class="unit">.service</span></div>
+          <div class="svc-desc">Production-grade AWS ECS (EC2 launch type) infrastructure, designed and built end-to-end with no prior template.</div>
+          <div class="svc-detail">Owned architecture, networking (VPC), task/service definitions, ECR image pipeline, and ongoing operations for business-critical applications. Sole owner from design through production.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">cost-optimizer <span class="unit">.service</span></div>
+          <div class="svc-desc">Lambda-based automation for resource scheduling, Spot/On-Demand blending, and right-sizing recommendations.</div>
+          <div class="svc-detail">Primary driver of the 40% reduction in monthly AWS spend, running continuously against live production workloads.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">ec2-rds-scheduler <span class="unit">.timer</span></div>
+          <div class="svc-desc">Automated start/stop of EC2 and RDS instances on nights and weekends.</div>
+          <div class="svc-detail">Eliminates compute spend during predictable off-hours. Reduced compute cost by an additional ~30% on top of baseline optimization.</div>
+        </div>
+        <span class="svc-status">active (timer)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">idle-resource-cleanup <span class="unit">.timer</span></div>
+          <div class="svc-desc">Monthly job that finds and removes unused AWS resources before they accrue cost.</div>
+          <div class="svc-detail">Runs on a monthly schedule across the account, flagging and cleaning orphaned volumes, snapshots, and unattached resources.</div>
+        </div>
+        <span class="svc-status">active (timer)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">iam-key-rotation <span class="unit">.service</span></div>
+          <div class="svc-desc">Automated IAM access-key rotation and security compliance checks via AWS Config + Lambda.</div>
+          <div class="svc-detail">Strengthens audit readiness and removes a recurring manual security task from the team's plate.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">ecr-lifecycle-policy <span class="unit">.service</span></div>
+          <div class="svc-desc">Automated lifecycle rules for container image retention in ECR.</div>
+          <div class="svc-detail">Keeps the registry lean by expiring untagged and stale images automatically, cutting storage cost and clutter.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">alert-mailer <span class="unit">.service</span></div>
+          <div class="svc-desc">Automated mailer for operational alerts, cost reports, and compliance summaries.</div>
+          <div class="svc-detail">Keeps stakeholders informed without manual reporting &mdash; built to surface the right signal at the right time.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">log-forward-opensearch <span class="unit">.service</span></div>
+          <div class="svc-desc">Centralized log forwarding from production servers to OpenSearch.</div>
+          <div class="svc-detail">Gives the team searchable, centralized logs across services for faster root-cause analysis during incidents.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">apm-newrelic <span class="unit">.service</span></div>
+          <div class="svc-desc">New Relic APM integration across servers for application performance monitoring.</div>
+          <div class="svc-detail">Captures traces, latency, throughput, and error data end-to-end, complementing CloudWatch for full-stack observability.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+
+      <div class="svc-row">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">cicd-pipeline <span class="unit">.service</span></div>
+          <div class="svc-desc">Jenkins CI/CD pipelines for containerized microservices with zero-downtime deployments.</div>
+          <div class="svc-detail">Covers build, test, and deploy stages, paired with CloudWatch alarms and log-based alerting for proactive incident detection.</div>
+        </div>
+        <span class="svc-status">active (running)</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="sec-head"><span class="sec-tag">02</span><span class="sec-title">experience log</span></div>
+
+    <div class="job">
+      <div class="job-top">
+        <div class="job-title">Aakash Educational Services Limited</div>
+        <div class="job-meta">FEB 2023 — PRESENT · Noida Sector 125, INDIA</div>
+      </div>
+      <div class="job-role">Site Reliability Engineer / DevOps Engineer</div>
+      <ul class="job-list">
+        <li><strong>Sole architect</strong> of the company's production AWS ECS infrastructure, built entirely from scratch.</li>
+        <li>Set up centralized <strong>log forwarding to OpenSearch</strong> and integrated <strong>New Relic APM</strong> across servers for full-stack observability.</li>
+        <li>Administered <strong>Aurora MySQL and SQL Server RDS</strong> clusters &mdash; backups, performance tuning, and failover configuration.</li>
+        <li>Managed the full <strong>Docker</strong> container lifecycle: image builds, ECR registry, task definitions, and service deployments.</li>
+        <li>Stood up multiple infrastructure environments from scratch to support new applications and shifting business needs.</li>
+        <li>Diagnosed and resolved numerous production issues across infrastructure, deployments, and application performance.</li>
+        <li>Managed IAM roles and policies under least-privilege, AWS security best-practice standards.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="sec-head"><span class="sec-tag">03</span><span class="sec-title">stack</span></div>
+    <div class="stack-grid">
+      <div class="stack-cat">
+        <h3>AWS Cloud</h3>
+        <div class="chip-row">
+          <span class="chip">ECS</span><span class="chip">EC2</span><span class="chip">S3</span><span class="chip">VPC</span>
+          <span class="chip">Lambda</span><span class="chip">CloudFront</span><span class="chip">IAM</span>
+          <span class="chip">RDS / Aurora</span><span class="chip">CloudWatch</span><span class="chip">ECR</span><span class="chip">AWS Config</span>
+        </div>
+      </div>
+      <div class="stack-cat">
+        <h3>Observability</h3>
+        <div class="chip-row">
+          <span class="chip">OpenSearch</span><span class="chip">New Relic APM</span><span class="chip">CloudWatch</span>
+          <span class="chip">Log-Based Alerting</span><span class="chip">SLA Monitoring</span>
+        </div>
+      </div>
+      <div class="stack-cat">
+        <h3>DevOps & CI/CD</h3>
+        <div class="chip-row">
+          <span class="chip">Jenkins</span><span class="chip">Docker</span><span class="chip">CI/CD Design</span>
+          <span class="chip">Zero-Downtime Deploys</span><span class="chip">Git</span>
+        </div>
+      </div>
+      <div class="stack-cat">
+        <h3>Automation & Scripting</h3>
+        <div class="chip-row">
+          <span class="chip">Python</span><span class="chip">Bash</span><span class="chip">Lambda Functions</span><span class="chip">Scheduled Jobs</span>
+        </div>
+      </div>
+      <div class="stack-cat">
+        <h3>Security & Ops</h3>
+        <div class="chip-row">
+          <span class="chip">Least-Privilege IAM</span><span class="chip">Key Rotation</span>
+          <span class="chip">AWS Config Compliance</span>
+          <span class="chip">Jira</span><span class="chip">Confluence</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="sec-head"><span class="sec-tag">04</span><span class="sec-title">education</span></div>
+    <div class="ed-grid">
+      <div class="ed-card">
+        <div class="k">DEGREE · 2021–2023</div>
+        <div class="v">Master of Computer Applications (MCA)</div>
+        <div class="s">Jamia Millia Islamia University, New Delhi</div>
+      </div>
+      <div class="ed-card">
+        <div class="k">SCHOOLING · 2017</div>
+        <div class="v">10th & 12th</div>
+        <div class="s">Jawahar Navodaya Vidyalaya, Farrukhabad, UP</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="certs">
+    <div class="sec-head"><span class="sec-tag">05</span><span class="sec-title">certifications &amp; recognition</span></div>
+    <div class="svc-board">
+      <div class="svc-row">
+        <span class="svc-dot" style="background:var(--amber);box-shadow:0 0 8px var(--amber);"></span>
+        <div>
+          <div class="svc-name">Employee of the Quarter <span class="unit">— Aakash Educational Services</span></div>
+          <div class="svc-desc">Company-wide recognition, awarded twice during tenure.</div>
+          <div class="svc-detail">Recognized for infrastructure ownership, production reliability, and consistent cross-team impact.</div>
+        </div>
+        <span class="svc-status" style="color:var(--amber);border-color:#4a3420;background:rgba(242,166,90,0.08);">2× awarded</span>
+      </div>
+      <a class="svc-row" href="https://drive.google.com/file/d/1kSvOBXfXVQPO2E3WLrESgReEd5Yxwhtl/view?pli=1" target="_blank" rel="noopener" style="text-decoration:none;">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">AWS Certified Solutions Architect <span class="unit">— Professional</span></div>
+          <div class="svc-desc">Advanced Architecting on AWS</div>
+        </div>
+        <span class="svc-status">view ↗</span>
+      </a>
+      <a class="svc-row" href="https://learn.kodekloud.com/certificate/9be11f61-c5e9-4779-9584-c5e23ca014c8" target="_blank" rel="noopener" style="text-decoration:none;">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">Amazon Elastic Container Service (AWS ECS) <span class="unit">— KodeKloud</span></div>
+          <div class="svc-desc">Container orchestration on AWS ECS</div>
+        </div>
+        <span class="svc-status">view ↗</span>
+      </a>
+      <a class="svc-row" href="https://www.trainwithshubham.com/share-certificate?serialno=KX9NTYII" target="_blank" rel="noopener" style="text-decoration:none;">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">Advanced DevOps <span class="unit">— TrainWithShubham</span></div>
+          <div class="svc-desc">End-to-end DevOps tooling and practices</div>
+        </div>
+        <span class="svc-status">view ↗</span>
+      </a>
+      <a class="svc-row" href="https://www.hackerrank.com/certificates/699b25b85c9c" target="_blank" rel="noopener" style="text-decoration:none;">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">Python for Scripting & Lambda Automation <span class="unit">— HackerRank</span></div>
+          <div class="svc-desc">Automation scripting for AWS Lambda</div>
+        </div>
+        <span class="svc-status">view ↗</span>
+      </a>
+      <a class="svc-row" href="https://www.hackerrank.com/certificates/303d0f446e13" target="_blank" rel="noopener" style="text-decoration:none;">
+        <span class="svc-dot"></span>
+        <div>
+          <div class="svc-name">SQL <span class="unit">— HackerRank</span></div>
+          <div class="svc-desc">For Aurora MySQL RDS administration</div>
+        </div>
+        <span class="svc-status">view ↗</span>
+      </a>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div class="contact-card">
+      <h2>$ contact --abhay</h2>
+      <p>Open to Site Reliability and DevOps Engineer roles. Reach out directly &mdash; I usually reply within a day.</p>
+      <div class="contact-links">
+        <a class="btn btn-primary" href="mailto:abhayrajpoot4200@gmail.com">✉ Email me</a>
+        <a class="btn btn-ghost" href="tel:+917880814200">📞 7880814200</a>
+        <a class="btn btn-ghost" href="https://github.com/abhaysingh07082000" target="_blank" rel="noopener">GitHub ↗</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/abhay-singh07/" target="_blank" rel="noopener">LinkedIn ↗</a>
+      </div>
+    </div>
+    <div class="footnote">Sukhdev Vihar, New Delhi · Built &amp; deployed by Abhay Singh</div>
+  </footer>
+
+</div>
+
+<script>
+  // expand/collapse service rows
+  document.querySelectorAll('.svc-row').forEach(row=>{
+    row.setAttribute('tabindex','0');
+    row.addEventListener('click', ()=> row.classList.toggle('open'));
+    row.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); row.classList.toggle('open'); }
+    });
+  });
+
+  // live "uptime" counter: years+days in role since Feb 1 2023
+  (function(){
+    const start = new Date('2023-02-01T00:00:00');
+    const el = document.getElementById('uptimeYears');
+    function update(){
+      const now = new Date();
+      const years = (now - start) / (1000*60*60*24*365.25);
+      el.textContent = years.toFixed(2) + 'y';
+    }
+    update();
+    setInterval(update, 60000);
+  })();
+</script>
+
+</body>
+</html>
